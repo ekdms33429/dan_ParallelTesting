@@ -1,3 +1,4 @@
+
 '''
     adb devices 목록에서 기기명 추출
     server threads: cmd Appium 으로 기기 하나당 서버 하나(port) 생성
