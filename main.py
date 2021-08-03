@@ -2,25 +2,31 @@ import os
 import re
 import threading
 import time
-
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 from appium import webdriver
 
 def startServers(serial, port):
-    cmd = 'appium --address 127.00.0.1' + ' --port ' + str(port) + ' --bootstrap-port ' + str(port -2000)+ ' -U ' + serial + ' --session-override --no-reset '
+    cmd = 'appium --address 127.0.0.1' + ' --port ' + str(port) + ' --bootstrap-port ' + str(port -2000)+ ' -U ' + serial + ' --session-override --no-reset '
+    print(threading.currentThread().getName(), " ", newPort)
     os.system(cmd)
 class TestParallel:
     def setUp(self, serial, newPort, systemPort):
-        desired_caps = {}
-        desired_caps['platformName'] = 'Android'
-        desired_caps['platformVersion'] = '11'
-        desired_caps['automationName'] = 'uiautomator2'
-        desired_caps['app'] = 'C:\\Users\\KIWIPLUS\\Desktop\\apk\\kiwiplay-v1.1.1(111)-stage-debug.apk'
-        desired_caps['udid'] = serial
-        desired_caps['systemPort'] = systemPort
-        self.driver = webdriver.Remote("http://localhost:" + str(newPort) +"/wd/hub", desired_caps)
+        desired_cap = {}
+        desired_cap['platformName'] = 'Android'
+        desired_cap['platformVersion'] = '11'
+        desired_cap['automationName'] = 'uiautomator2'
+        desired_cap['app'] = 'C:\\Users\\KIWIPLUS\\Desktop\\apk\\kiwiplay-v1.1.1(111)-stage-debug.apk'
+        desired_cap['deviceUDID'] = serial
+        desired_cap['systemPort'] = systemPort
+        server_url = "http://localhost:" + str(newPort) +"/wd/hub"
+        print(server_url)
+        self.driver = webdriver.Remote(server_url, desired_cap)
+        self.driver.implicitly_wait(30)
         self.testCase(serial)
     def testCase(self, serial):
-        self.tearDown()
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//*[contains(@text, '로그인')]")))
     def tearDown(self):
         self.driver.quit()
 
@@ -45,10 +51,10 @@ if __name__ == '__main__':
             print(serial[0])
             threads.append(threading.Thread(target=startServers, args=(serial[0], newPort)))
             threads1.append(threading.Thread(target=test.setUp, args=(serial[0], newPort, systemPort)))
-            for t in threads:
-                t.start()
-                time.sleep(30)
-            for f in threads1:
-                f.start()
+    for t in threads:
+        t.start()
+        time.sleep(30)
+    for f in threads1:
+        f.start()
 
 
