@@ -1,3 +1,9 @@
+'''
+    adb devices 목록에서 기기명 추출
+    server threads: cmd Appium 으로 기기 하나당 서버 하나(port) 생성
+    dv threads: desired caps
+
+'''
 import os
 import re
 import threading
@@ -32,8 +38,8 @@ class TestParallel:
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    threads = []
-    threads1 =[]
+    server_threads = []
+    dv_threads =[]
     port=4722
     out = os.popen("adb devices")
     a=0
@@ -49,12 +55,12 @@ if __name__ == '__main__':
             a = a+1
             serial = re.findall('(.*)device', i)
             print(serial[0])
-            threads.append(threading.Thread(target=startServers, args=(serial[0], newPort)))
-            threads1.append(threading.Thread(target=test.setUp, args=(serial[0], newPort, systemPort)))
-    for t in threads:
+            server_threads.append(threading.Thread(target=startServers, args=(serial[0], newPort))) #server thread
+            dv_threads.append(threading.Thread(target=test.setUp, args=(serial[0], newPort, systemPort))) #device thread
+    for t in server_threads:
         t.start()
         time.sleep(30)
-    for f in threads1:
+    for f in dv_threads:
         f.start()
 
 
