@@ -37,6 +37,7 @@ class TestParallel:
         desired_cap['app'] = 'C:\\Users\\KIWIPLUS\\Desktop\\apk\\kiwiplay-v1.1.1(111)-stage-debug.apk'
         desired_cap['deviceUDID'] = serial
         desired_cap['systemPort'] = systemPort
+        desired_cap['language'] = "kr"
         server_url = "http://localhost:" + str(newPort) +"/wd/hub"
         print(server_url)
         self.driver = webdriver.Remote(server_url, desired_cap)
